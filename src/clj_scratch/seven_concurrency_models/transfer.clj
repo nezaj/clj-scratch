@@ -5,8 +5,8 @@
 
 (defn transfer [from to amount]
   (dosync
-   (swap! attempts inc)
-   (send transfers inc)
+   (swap! attempts inc)  ; swap! is not transaction safe, since swap! will be called even if the transaction fails
+   (send transfers inc)  ; send is transaction safe, since send will execute iff the transaction succeeds
    (alter from - amount)
    (alter to + amount)))
 
