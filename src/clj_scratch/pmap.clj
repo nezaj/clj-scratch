@@ -17,7 +17,24 @@
   (doall (take list-length (repeatedly (partial rand-string string-length)))))
 
 (def rand-strings (rand-string-list 3000 7000))
+(def rand-small-strings (rand-string-list 9000 200))
+
+(defn ppmap
+  "Partioned pmap. Groups several ops together to make
+  pmap worthwhile"
+  [grain-size f & colls]
+  (apply concat
+         (apply pmap
+                (fn [& pgroups] (doall (apply map f pgroups)))
+                (map (partial partition-all grain-size) colls))))
 
 (comment
+  ; pmap is faster for large strings
   (time (dorun (map string/lower-case rand-strings)))
-  (time (dorun (pmap string/lower-case rand-strings))))
+  (time (dorun (pmap string/lower-case rand-strings)))
+
+  ; pmap is slower for small strings
+  ; but we can speed it up with ppmap
+  (time (dorun (map string/lower-case rand-small-strings)))
+  (time (dorun (pmap string/lower-case rand-small-strings)))
+  (time (dorun (ppmap 1000 string/lower-case rand-small-strings))))
