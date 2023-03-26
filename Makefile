@@ -3,4 +3,4 @@ MAKE = make $(MAKEFLAGS)
 
 repl:
 	@echo "Connecting local repl..."
-	$(LEIN) repl
+	lein repl
